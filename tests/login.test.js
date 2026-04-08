@@ -2,9 +2,15 @@
 import http from 'k6/http';
 
 // Import the sleep function to introduce delays. From this point, you can use the `sleep` function to introduce delays in your test script.
-import { sleep } from 'k6';
+import { sleep,check } from 'k6';
+
+
 export const options = {
-    iterations:2,
+    iterations:50,
+    thresholds:{
+        http_req_duration: ['p(95)<10', 'max<10'],
+        http_req_failed: ['rate<0.01'],   
+       }
 }
 
 export default function () {
@@ -24,8 +30,9 @@ export default function () {
   };
 
  const resposta = http.post(url, payload, params);
- console.log(resposta.status);
- console.log(resposta.body);
+  check(resposta, {  
+      'Status é 200': (r) => r.status === 200, 
+       'token é string': (r) => typeof r.json().token === 'string',});
 
 
   sleep(1);
