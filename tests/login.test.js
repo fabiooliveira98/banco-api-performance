@@ -1,14 +1,19 @@
-// Import the http module to make HTTP requests. From this point, you can use `http` methods to make HTTP requests.
-import http from 'k6/http';
 
-// Import the sleep function to introduce delays. From this point, you can use the `sleep` function to introduce delays in your test script.
+import http from 'k6/http';
 import { sleep,check } from 'k6';
 
 
 export const options = {
     //iterations:50,
-    vus: 10,
-    duration: '30s',
+    //vus: 10,
+    //duration: '30s',
+    stages:[
+      {duration:'10s',target:10},
+      {duration:'20s',target:20},
+      {duration:'10s',target:30},
+      {duration:'20s',target:30},
+      {duration:'20s',target:0},
+    ],
     thresholds:{
         http_req_duration: ['p(90)<3000', 'max<5000'],
         http_req_failed: ['rate<0.01'],   
@@ -39,3 +44,4 @@ export default function () {
 
   sleep(1);
 }
+// $env:K6_WEB_DASHBOARD="true"; $env:K6_WEB_DASHBOARD_EXPORT="html-report.html"; k6 run .\tests\login.test.js
